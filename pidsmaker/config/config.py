@@ -27,8 +27,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "THEIA_E3": {
         "raw_dir": "",
-        "database": "theia_e3",
-        "database_all_file": "theia_e3",
+        "database": "THEIA_E3",
+        "database_all_file": "THEIA_E3",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2018-04",
@@ -536,22 +536,16 @@ TASK_ARGS = {
             "node_label_features": {
                 "subject": Arg(
                     str,
-                    vals=AND(["type", "path", "cmd_line"]),
+                    vals=["type", "path", "cmd_line"],
                     desc="Which features use for process nodes. Features will be concatenated.",
                 ),
                 "file": Arg(
                     str,
-                    vals=AND(
-                        ["type", "path"],
-                        desc="Which features use for file nodes. Features will be concatenated.",
-                    ),
+                    vals=["type", "path"],
                 ),
                 "netflow": Arg(
                     str,
-                    vals=AND(
-                        ["type", "remote_ip", "remote_port"],
-                        desc="Which features use for netflow nodes. Features will be concatenated.",
-                    ),
+                    vals=["type", "remote_ip", "remote_port"],
                 ),
             },
             "multi_dataset": Arg(
@@ -563,10 +557,7 @@ TASK_ARGS = {
         "transformation": {
             "used_methods": Arg(
                 str,
-                vals=AND(
-                    ["undirected", "dag", "rcaid_pseudo_graph", "none"]
-                    + list(SYNTHETIC_ATTACKS.keys())
-                ),
+                vals=["undirected", "dag", "rcaid_pseudo_graph", "none"] + list(SYNTHETIC_ATTACKS.keys()),
                 desc="Applies transformations to graphs after their construction. Multiple transformations can be applied sequentially. Example: `used_methods=undirected,dag`",
             ),
             "rcaid_pseudo_graph": {
@@ -614,14 +605,14 @@ TASK_ARGS = {
             ),
             "node_features": Arg(
                 str,
-                vals=AND(["node_type", "node_emb", "only_ones", "edges_distribution"]),
+                vals=["node_type", "node_emb", "only_ones", "edges_distribution"],
                 desc="Node features to use during GNN training. `node_type` is a one-hot encoded entity type vector, \
                                      `node_emb` refers to the embedding generated during the `featurization` task, `only_ones` is a vector of ones \
                                       with length `node_type`, `edges_distribution` counts emitted and received edges.",
             ),
             "edge_features": Arg(
                 str,
-                vals=AND(["edge_type", "edge_type_triplet", "msg", "time_encoding", "none"]),
+                vals=["edge_type", "edge_type_triplet", "msg", "time_encoding", "none"],
                 desc="Edge features to used during GNN training. `edge_type` refers to the system call type, `edge_type_triplet` \
                                     considers a same edge type as a new type if source or destination node types are different, `msg` is the message vector \
                                     used in the TGN, `time_encoding` encodes temporal order of events with their timestamps in the TGN, `none` uses no features.",
@@ -655,7 +646,7 @@ TASK_ARGS = {
             "intra_graph_batching": {
                 "used_methods": Arg(
                     str,
-                    vals=AND(["edges", "tgn_last_neighbor", "none"]),
+                    vals=["edges", "tgn_last_neighbor", "none"],
                     desc="Breaks each previously computed graph into even smaller graphs. \
                                     `edges` creates contiguous graphs of size `intra_graph_batch_size` edges (if a graph has 2000 edges and `intra_graph_batch_size=1500` \
                                     creates two graphs: one with 1500 edges, the other with 500 edges), `tgn_last_neighbor` computes for each graph its associated graph \
@@ -731,7 +722,7 @@ TASK_ARGS = {
                 "dropout": Arg(float),
                 "used_methods": Arg(
                     str,
-                    vals=AND(list(ENCODERS_CFG.keys())),
+                    vals=list(ENCODERS_CFG.keys()),
                     desc="First part of the neural network. Usually GNN encoders to capture complex patterns.",
                 ),
                 **ENCODERS_CFG,
@@ -739,7 +730,7 @@ TASK_ARGS = {
             "decoder": {
                 "used_methods": Arg(
                     str,
-                    vals=AND(list(OBJECTIVES_CFG.keys())),
+                    vals=list(OBJECTIVES_CFG.keys()),
                     desc="Second part of the neural network. Usually MLPs specific to the downstream task (e.g. reconstruction of prediction)",
                 ),
                 **OBJECTIVES_CFG,
@@ -862,7 +853,7 @@ EXPERIMENTS_CONFIG = {
         "used_method": Arg(str, vals=OR(["uncertainty", "none"])),
         "uncertainty": {
             "hyperparameter": {
-                "hyperparameters": Arg(str, vals=AND(["lr, num_epochs, text_h_dim, gnn_h_dim"])),
+                "hyperparameters": Arg(str, vals=["lr, num_epochs, text_h_dim, gnn_h_dim"]),
                 "iterations": Arg(int),
                 "delta": Arg(float),
             },

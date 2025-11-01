@@ -49,7 +49,7 @@ def main(cfg):
             higlist = ip2higlist(node_label)
         higstr = list2str(higlist)
 
-        dense_vector = FH_string.fit_transform([higstr]).toarray()
+        dense_vector = FH_string.fit_transform([higstr.split() if isinstance(higstr, str) else list(higstr)]).toarray()
 
         normalized_vector = dense_vector / (np.linalg.norm(dense_vector) + 1e-12)
         indexid2vec[indexid] = normalized_vector.squeeze()

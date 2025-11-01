@@ -113,7 +113,7 @@ def init_database_connection(cfg):
     if cfg.database.host is not None:
         connect = psycopg2.connect(
             database=database_name,
-            host=cfg.database.host,
+            host="127.0.0.1",
             user=cfg.database.user,
             password=cfg.database.password,
             port=cfg.database.port,
