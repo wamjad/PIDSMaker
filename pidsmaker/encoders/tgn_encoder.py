@@ -123,7 +123,8 @@ class TGNEncoder(nn.Module):
 
         # Update memory and neighbor loader with ground-truth state.
         if self.use_memory or self.use_time_enc:
-            self.memory.update_state(batch.src, batch.dst, batch.t, batch.msg)
+            self.memory.update_state(batch.src, batch.dst, batch.t, batch.msg, n_id=batch.n_id_tgn)
+
 
         # Detaching memory is only useful for backprop in training
         if self.use_memory and not inference:

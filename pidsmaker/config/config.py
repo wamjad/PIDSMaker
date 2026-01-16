@@ -3,8 +3,8 @@
 DATASET_DEFAULT_CONFIG = {
     "THEIA_E5": {
         "raw_dir": "",
-        "database": "theia_e5",
-        "database_all_file": "theia_e5",
+        "database": "THEIA_E5",
+        "database_all_file": "THEIA_E5",
         # "database_all_file": "theia_e5_all", # NOTE: the whole dataset is too huge
         "num_node_types": 3,
         "num_edge_types": 10,
@@ -66,8 +66,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "CADETS_E5": {
         "raw_dir": "",
-        "database": "cadets_e5",
-        "database_all_file": "cadets_e5",
+        "database": "CADETS_E5",
+        "database_all_file": "CADETS_E5",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2019-05",
@@ -91,8 +91,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "CADETS_E3": {
         "raw_dir": "",
-        "database": "cadets_e3",
-        "database_all_file": "cadets_e3",
+        "database": "CADETS_E3",
+        "database_all_file": "CADETS_E3",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2018-04",
@@ -125,8 +125,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "CLEARSCOPE_E5": {
         "raw_dir": "",
-        "database": "clearscope_e5",
-        "database_all_file": "clearscope_e5",
+        "database": "CLEARSCOPE_E5",
+        "database_all_file": "CLEARSCOPE_E5",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2019-05",
@@ -162,8 +162,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "CLEARSCOPE_E3": {
         "raw_dir": "",
-        "database": "clearscope_e3",
-        "database_all_file": "clearscope_e3",
+        "database": "CLEARSCOPE_E3",
+        "database_all_file": "CLEARSCOPE_E3",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2018-04",
@@ -195,8 +195,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "optc_h201": {
         "raw_dir": "",
-        "database": "optc_201",
-        "database_all_file": "optc_201",
+        "database": "optc_h201",
+        "database_all_file": "optc_h201",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2019-09",
@@ -214,8 +214,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "optc_h501": {
         "raw_dir": "",
-        "database": "optc_501",
-        "database_all_file": "optc_501",
+        "database": "optc_h501",
+        "database_all_file": "optc_h501",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2019-09",
@@ -233,8 +233,8 @@ DATASET_DEFAULT_CONFIG = {
     },
     "optc_h051": {
         "raw_dir": "",
-        "database": "optc_051",
-        "database_all_file": "optc_051",
+        "database": "optc_h051",
+        "database_all_file": "optc_h051",
         "num_node_types": 3,
         "num_edge_types": 10,
         "year_month": "2019-09",

@@ -46,13 +46,32 @@ class CollatableTemporalData(TemporalData):
         self.tgn_mode = False
 
     def __inc__(self, key: str, value, *args, **kwargs):
-        if key == "original_edge_index":  # used to retrieve original node IDs during evaluation
+        # Global ids / metadata: never shift
+        if key in {"original_edge_index", "n_id_tgn"}:
             return 0
-        if "edge_index" in key or key in ["src", "dst", "reindexed_original_n_id_tgn"]:
-            if self.tgn_mode:
-                return torch.unique(self.n_id_tgn).numel()
+    
+        # In TGN mode, src/dst are GLOBAL ids (TemporalDataLoader batches edges),
+        # so never shift them.
+        if self.tgn_mode and key in {"src", "dst"}:
+            return 0
+    
+        # In TGN mode, these tensors are LOCAL to n_id_tgn (0..len(n_id_tgn)-1),
+        # so shift by local node count when batching graphs.
+        if self.tgn_mode and key in {
+            "edge_index_tgn",
+            "reindexed_edge_index_tgn",
+            "reindexed_original_n_id_tgn",
+        }:
+            return self.n_id_tgn.numel()
+    
+        # Default behavior for non-TGN mode (standard local indexing)
+        if "edge_index" in key or key in {"src", "dst"}:
             return self.num_nodes
+    
         return 0
+
+
+
 
     def __cat_dim__(self, key: str, value, *args, **kwargs):
         return 1 if "edge_index" in key else 0
@@ -300,6 +319,10 @@ def extract_msg_from_data(
 
 
 def get_possible_triplets(cfg):
+    # MINIMAL CHANGE: skip triplets for OPTC datasets
+    if cfg.dataset.name in {'optc_h051', 'optc_h201', 'optc_h501'}:
+        return torch.empty((0, 3), dtype=torch.long)
+
     entity_map = get_node_map(from_zero=True)
     event_map = get_rel2id(cfg, from_zero=True)
 
@@ -309,6 +332,7 @@ def get_possible_triplets(cfg):
         for event in events
     ]
     return torch.tensor(possible_triplets, dtype=torch.long)
+
 
 
 def get_triplet_edge_types(src_type, dst_type, edge_type, possible_triplets, num_edge_types):

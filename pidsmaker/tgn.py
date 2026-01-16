@@ -1,5 +1,5 @@
 import copy
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Optional
 
 import torch
 from torch import Tensor
@@ -102,20 +102,32 @@ class TGNMemory(torch.nn.Module):
 
         return memory, last_update
 
-    def update_state(self, src: Tensor, dst: Tensor, t: Tensor, raw_msg: Tensor):
+    def update_state(self, src: Tensor, dst: Tensor, t: Tensor, raw_msg: Tensor, n_id: Tensor | None = None,):
         """Updates the memory with newly encountered interactions
         :obj:`(src, dst, t, raw_msg)`.
         """
-        n_id = torch.cat([src, dst]).unique()
+        # If caller provides `n_id` (roots + sampled neighbors), update that union.
+        # Otherwise fallback to just endpoints (original behavior).
+        n_id_update = n_id if n_id is not None else torch.cat([src, dst]).unique()
 
         if self.training:
-            self._update_memory(n_id)
+            self._update_memory(n_id_update)
+            self._clear_message_store_for_nodes(n_id_update)
             self._update_msg_store(src, dst, t, raw_msg, self.msg_s_store)
             self._update_msg_store(dst, src, t, raw_msg, self.msg_d_store)
         else:
             self._update_msg_store(src, dst, t, raw_msg, self.msg_s_store)
             self._update_msg_store(dst, src, t, raw_msg, self.msg_d_store)
-            self._update_memory(n_id)
+            self._update_memory(n_id_update)
+            
+            
+    def _clear_message_store_for_nodes(self, n_id: Tensor):
+        # Reset message store entries for specific nodes to empty.
+        i = self.memory.new_empty((0,), device=self.device, dtype=torch.long)
+        msg = self.memory.new_empty((0, self.raw_msg_dim), device=self.device)
+        for j in n_id.tolist():
+            self.msg_s_store[j] = (i, i, i, msg)
+            self.msg_d_store[j] = (i, i, i, msg)        
 
     def _reset_message_store(self):
         i = self.memory.new_empty((0,), device=self.device, dtype=torch.long)
@@ -222,20 +234,28 @@ class TimeEncodingMemory(torch.nn.Module):
         zeros(self.last_update)
         self._reset_message_store()
 
-    def update_state(self, src: Tensor, dst: Tensor, t: Tensor, raw_msg: Tensor):
-        """Updates the memory with newly encountered interactions
-        :obj:`(src, dst, t, raw_msg)`.
-        """
-        n_id = torch.cat([src, dst]).unique()
+    def update_state(self, src: Tensor, dst: Tensor, t: Tensor, raw_msg: Tensor, n_id: Tensor | None = None,):
+        """Updates the memory with newly encountered interactions."""
+        
+        n_id_update = n_id if n_id is not None else torch.cat([src, dst]).unique()
+
 
         if self.training:
-            self._update_memory(n_id)
+            self._update_memory(n_id_update)
+            self._clear_message_store_for_nodes(n_id_update)
             self._update_msg_store(src, dst, t, raw_msg, self.msg_s_store)
             self._update_msg_store(dst, src, t, raw_msg, self.msg_d_store)
         else:
             self._update_msg_store(src, dst, t, raw_msg, self.msg_s_store)
             self._update_msg_store(dst, src, t, raw_msg, self.msg_d_store)
-            self._update_memory(n_id)
+            self._update_memory(n_id_update)
+            
+            
+    def _clear_message_store_for_nodes(self, n_id: Tensor):
+        i = torch.empty((0,), device=self.device, dtype=torch.long)
+        for j in n_id.tolist():
+            self.msg_s_store[j] = (i, i, i)
+            self.msg_d_store[j] = (i, i, i)        
 
     def _reset_message_store(self):
         i = torch.empty((0,), device=self.device, dtype=torch.long)
@@ -348,6 +368,7 @@ class LastNeighborLoader:
         neighbors = self.neighbors[n_id]
         nodes = n_id.view(-1, 1).repeat(1, self.size)
         e_id = self.e_id[n_id]
+        
 
         # Filter invalid neighbors (identified by `e_id < 0`).
         mask = e_id >= 0
